@@ -18,7 +18,9 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "prisma:migrate:dev": "prisma migrate dev",
+    "prisma:migrate:dev:create": "prisma migrate dev --create-only"
   },
   "dependencies": {
     "@apollo/server": "^4.11.3",
@@ -32,10 +34,13 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/client": "^6.4.1",
     "apollo-server-express": "^3.13.0",
+    "argon2": "^0.41.1",
     "bcryptjs": "^3.0.2",
     "graphql": "^16.10.0",
     "nestjs-prisma": "^0.25.0",
+    "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"
   },
@@ -50,6 +55,7 @@
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.10.7",
+    "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",

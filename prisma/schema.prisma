@@ -9,9 +9,9 @@ generator client {
 }
 
 generator nestgraphql {
-  provider = "node node_modules/prisma-nestjs-graphql"
+  provider   = "node node_modules/prisma-nestjs-graphql"
   emitBlocks = ["models"]
-  output   = "../src/@generated/objectTypes"
+  output     = "../src/@generated/objectTypes"
 }
 
 datasource db {
@@ -20,8 +20,13 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  password String
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  /// @HideField()
+  password     String
+  /// @HideField()
+  refreshToken String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
