@@ -1,4 +1,5 @@
 import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
+import { ExpenseModule } from './expense/expense.module';
 
-export default [AuthModule, UsersModule];
+export default [AuthModule, UserModule, ExpenseModule];

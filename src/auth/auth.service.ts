@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import * as argon2 from 'argon2';
 import { User } from 'src/@generated/objectTypes/user/user.model';
 import { JwtService } from '@nestjs/jwt';
@@ -8,12 +8,12 @@ import { jwtConstants } from './jwt.constants';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
 
   async validateUser(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.userService.findByEmail(email);
 
     if (user && (await argon2.verify(user.password, password))) {
       return user;
@@ -34,7 +34,7 @@ export class AuthService {
       expiresIn: jwtConstants.refreshSignOptions.expiresIn,
     });
 
-    await this.usersService.updateRefreshToken(user.id, refreshToken);
+    await this.userService.updateRefreshToken(user.id, refreshToken);
 
     return { accessToken, refreshToken };
   }
@@ -49,7 +49,7 @@ export class AuthService {
         throw new UnauthorizedException('Invalid or expired token');
       }
 
-      const user = await this.usersService.findOne(payload.id);
+      const user = await this.userService.findOne(payload.id);
 
       if (!user || user.refreshToken !== refreshToken) {
         throw new UnauthorizedException('Invalid or expired token');
@@ -62,7 +62,7 @@ export class AuthService {
   }
 
   async logout(userId: string) {
-    await this.usersService.updateRefreshToken(userId, null);
+    await this.userService.updateRefreshToken(userId, null);
     return true;
   }
 }

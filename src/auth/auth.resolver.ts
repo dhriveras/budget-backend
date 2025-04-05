@@ -1,25 +1,25 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Context, Mutation, Resolver } from '@nestjs/graphql';
 import { User } from 'src/@generated/objectTypes/user/user.model';
-import { CreateUserInput } from 'src/users/inputTypes/create-user.input';
-import { UsersService } from 'src/users/users.service';
+import { CreateUserInput } from 'src/user/inputTypes/create-user.input';
+import { UserService } from 'src/user/user.service';
 import { GqlLocalAuthGuard } from './guards/local-auth.guard';
 import { AuthService } from './auth.service';
 import { Token } from './objectTypes/token.type';
 import { Public } from './decorators/public.decorator';
-import { Me } from 'src/users/decorators/me.decorator';
+import { Me } from 'src/user/decorators/me.decorator';
 
 @Resolver()
 export class AuthResolver {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly userService: UserService,
   ) {}
 
   @Public()
   @Mutation(() => User)
   singup(@Args('createUserInput') createUserInput: CreateUserInput) {
-    return this.usersService.create(createUserInput);
+    return this.userService.create(createUserInput);
   }
 
   @Public()
