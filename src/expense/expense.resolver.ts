@@ -1,14 +1,27 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { ExpenseService } from './expense.service';
 import { Expense } from 'src/@generated/objectTypes/expense/expense.model';
 import { CreateExpenseInput } from './inputTypes/create-expense.input';
 import { User } from 'src/@generated/objectTypes/user/user.model';
 import { Me } from 'src/user/decorators/me.decorator';
 import { UpdateExpenseInput } from './inputTypes/update-expense.input';
+import { Category } from 'src/@generated/objectTypes/category/category.model';
+import { CategoryService } from 'src/category/category.service';
+import { ExpenseFilterInput } from './inputTypes/filters/expense-filter.input';
 
 @Resolver(() => Expense)
 export class ExpenseResolver {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(
+    private readonly expenseService: ExpenseService,
+    private readonly categoryService: CategoryService,
+  ) {}
 
   @Query(() => Expense)
   async expense(@Args('id') id: string, @Me() user: User): Promise<Expense> {
@@ -16,8 +29,11 @@ export class ExpenseResolver {
   }
 
   @Query(() => [Expense])
-  async expenses(@Me() user: User): Promise<Expense[] | null> {
-    return this.expenseService.findAll(user.id);
+  async expenses(
+    @Me() user: User,
+    @Args('filter', { nullable: true }) filter?: ExpenseFilterInput,
+  ): Promise<Expense[] | null> {
+    return this.expenseService.findAll(user.id, filter);
   }
 
   @Mutation(() => Expense)
@@ -43,5 +59,12 @@ export class ExpenseResolver {
     @Me() user: User,
   ): Promise<Expense> {
     return this.expenseService.remove(id, user.id);
+  }
+
+  @ResolveField(() => Category, { nullable: true })
+  async category(
+    @Parent() { categoryId, createdBy }: Expense,
+  ): Promise<Category | void> {
+    if (categoryId) return this.categoryService.findOne(categoryId, createdBy);
   }
 }

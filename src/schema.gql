@@ -2,8 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Category {
+  _count: CategoryCount!
+  createdAt: DateTime!
+  createdBy: String!
+  description: String
+  expenses: [Expense!]
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type CategoryCount {
+  expenses: Int!
+}
+
+input CreateCategoryInput {
+  description: String
+  name: String!
+}
+
 input CreateExpenseInput {
   amount: Float!
+  categoryId: String
   date: DateTime!
   description: String
   name: String!
@@ -22,31 +44,46 @@ scalar DateTime
 
 type Expense {
   amount: Float!
+  category: Category
+  categoryId: String
   createdAt: DateTime!
+  createdBy: String!
   date: DateTime!
   description: String
   id: ID!
   name: String!
   updatedAt: DateTime!
   user: User!
-  userId: String!
+}
+
+input ExpenseFilterInput {
+  categoryId: String
+  dateFrom: DateTime
+  dateTo: DateTime
+  maxAmount: Float
+  minAmount: Float
 }
 
 type Mutation {
+  createCategory(data: CreateCategoryInput!): Category!
   createExpense(data: CreateExpenseInput!): Expense!
   deleteExpense(id: String!): Expense!
   login(email: String!, password: String!): Token!
   logout: Boolean!
   refreshToken(refreshToken: String!): Token!
+  removeCategory(id: String!): Category!
   removeUser(id: String!): User!
   singup(createUserInput: CreateUserInput!): User!
+  updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateExpense(data: UpdateExpenseInput!, id: String!): Expense!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
 }
 
 type Query {
+  categories: [Category!]!
+  category(id: String!): Category!
   expense(id: String!): Expense!
-  expenses: [Expense!]!
+  expenses(filter: ExpenseFilterInput): [Expense!]!
   me: User!
   user(id: String!): User!
   users: [User!]!
@@ -57,8 +94,14 @@ type Token {
   refreshToken: String!
 }
 
+input UpdateCategoryInput {
+  description: String
+  name: String
+}
+
 input UpdateExpenseInput {
   amount: Float
+  categoryId: String
   date: DateTime
   description: String
   name: String
@@ -71,6 +114,7 @@ input UpdateUserInput {
 
 type User {
   _count: UserCount!
+  categories: [Category!]
   createdAt: DateTime!
   email: String!
   expenses: [Expense!]
@@ -80,5 +124,6 @@ type User {
 }
 
 type UserCount {
+  categories: Int!
   expenses: Int!
 }

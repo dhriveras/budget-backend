@@ -3,11 +3,8 @@ import { ObjectType } from '@nestjs/graphql';
 import { Int } from '@nestjs/graphql';
 
 @ObjectType()
-export class UserCount {
+export class CategoryCount {
 
     @Field(() => Int, {nullable:false})
     expenses?: number;
-
-    @Field(() => Int, {nullable:false})
-    categories?: number;
 }

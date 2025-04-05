@@ -13,4 +13,7 @@ export class CreateExpenseInput {
 
   @Field(() => Date)
   date: Date;
+
+  @Field(() => String, { nullable: true })
+  categoryId: string;
 }
