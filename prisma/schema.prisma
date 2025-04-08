@@ -32,6 +32,8 @@ model User {
 
   expenses   Expense[]
   categories Category[]
+  accounts   Account[]
+  incomes    Income[]
 }
 
 model Category {
@@ -58,7 +60,54 @@ model Expense {
   categoryId  String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  accountId   String?
 
   user     User      @relation(fields: [createdBy], references: [id])
   category Category? @relation(fields: [categoryId], references: [id])
+  account  Account?  @relation(fields: [accountId], references: [id])
+}
+
+model Income {
+  id          String   @id @default(uuid())
+  name        String
+  amount      Float
+  date        DateTime
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  accountId   String
+
+  user    User    @relation(fields: [createdBy], references: [id])
+  account Account @relation(fields: [accountId], references: [id])
+}
+
+model Account {
+  id             String      @id @default(uuid())
+  name           String
+  description    String?
+  initialBalance Float
+  type           AccountType
+  currency       Currency
+  createdBy      String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  user     User      @relation(fields: [createdBy], references: [id])
+  expenses Expense[]
+  incomes  Income[]
+
+  @@unique([name, createdBy])
+}
+
+enum AccountType {
+  CASH
+  BANK
+  CREDIT_CARD
+}
+
+enum Currency {
+  NIO
+  USD
+  EUR
 }

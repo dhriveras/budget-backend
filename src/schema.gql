@@ -2,6 +2,34 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Account {
+  _count: AccountCount!
+  balance: Float!
+  createdAt: DateTime!
+  createdBy: String!
+  currency: Currency!
+  description: String
+  expenses: [Expense!]
+  id: ID!
+  incomes: [Income!]
+  initialBalance: Float!
+  name: String!
+  type: AccountType!
+  updatedAt: DateTime!
+  user: User!
+}
+
+type AccountCount {
+  expenses: Int!
+  incomes: Int!
+}
+
+enum AccountType {
+  BANK
+  CASH
+  CREDIT_CARD
+}
+
 type Category {
   _count: CategoryCount!
   createdAt: DateTime!
@@ -18,14 +46,31 @@ type CategoryCount {
   expenses: Int!
 }
 
+input CreateAccountInput {
+  currency: Currency! = USD
+  description: String
+  initialBalance: Float! = 0
+  name: String!
+  type: AccountType!
+}
+
 input CreateCategoryInput {
   description: String
   name: String!
 }
 
 input CreateExpenseInput {
+  accountId: String
   amount: Float!
   categoryId: String
+  date: DateTime!
+  description: String
+  name: String!
+}
+
+input CreateIncomeInput {
+  accountId: String!
+  amount: Float!
   date: DateTime!
   description: String
   name: String!
@@ -37,12 +82,20 @@ input CreateUserInput {
   password: String!
 }
 
+enum Currency {
+  EUR
+  NIO
+  USD
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
 type Expense {
+  account: Account
+  accountId: String
   amount: Float!
   category: Category
   categoryId: String
@@ -64,26 +117,57 @@ input ExpenseFilterInput {
   minAmount: Float
 }
 
+type Income {
+  account: Account!
+  accountId: String!
+  amount: Float!
+  createdAt: DateTime!
+  createdBy: String!
+  date: DateTime!
+  description: String
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+  user: User!
+}
+
+input IncomeFilterInput {
+  dateFrom: DateTime
+  dateTo: DateTime
+  maxAmount: Float
+  minAmount: Float
+}
+
 type Mutation {
+  createAccount(data: CreateAccountInput!): Account!
   createCategory(data: CreateCategoryInput!): Category!
   createExpense(data: CreateExpenseInput!): Expense!
+  createIncome(data: CreateIncomeInput!): Income!
   deleteExpense(id: String!): Expense!
+  deleteIncome(id: String!): Income!
   login(email: String!, password: String!): Token!
   logout: Boolean!
   refreshToken(refreshToken: String!): Token!
+  removeAccount(id: String!): Account!
   removeCategory(id: String!): Category!
   removeUser(id: String!): User!
   singup(createUserInput: CreateUserInput!): User!
+  updateAccount(data: UpdateAccountInput!, id: String!): Account!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!
   updateExpense(data: UpdateExpenseInput!, id: String!): Expense!
+  updateIncome(data: UpdateIncomeInput!, id: String!): Income!
   updateUser(id: String!, updateUserInput: UpdateUserInput!): User!
 }
 
 type Query {
+  account(id: String!): Account!
+  accounts: [Account!]!
   categories: [Category!]!
   category(id: String!): Category!
   expense(id: String!): Expense!
   expenses(filter: ExpenseFilterInput): [Expense!]!
+  income(id: String!): Income!
+  incomes(filter: IncomeFilterInput): [Income!]!
   me: User!
   user(id: String!): User!
   users: [User!]!
@@ -94,14 +178,31 @@ type Token {
   refreshToken: String!
 }
 
+input UpdateAccountInput {
+  currency: Currency = USD
+  description: String
+  initialBalance: Float = 0
+  name: String
+  type: AccountType
+}
+
 input UpdateCategoryInput {
   description: String
   name: String
 }
 
 input UpdateExpenseInput {
+  accountId: String
   amount: Float
   categoryId: String
+  date: DateTime
+  description: String
+  name: String
+}
+
+input UpdateIncomeInput {
+  accountId: String
+  amount: Float
   date: DateTime
   description: String
   name: String
@@ -114,16 +215,20 @@ input UpdateUserInput {
 
 type User {
   _count: UserCount!
+  accounts: [Account!]
   categories: [Category!]
   createdAt: DateTime!
   email: String!
   expenses: [Expense!]
   id: ID!
+  incomes: [Income!]
   name: String!
   updatedAt: DateTime!
 }
 
 type UserCount {
+  accounts: Int!
   categories: Int!
   expenses: Int!
+  incomes: Int!
 }

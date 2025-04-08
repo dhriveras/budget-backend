@@ -1,7 +1,7 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
 
 @InputType()
-export class CreateExpenseInput {
+export class CreateIncomeInput {
   @Field(() => String)
   name: string;
 
@@ -14,9 +14,6 @@ export class CreateExpenseInput {
   @Field(() => Date)
   date: Date;
 
-  @Field(() => String, { nullable: true })
-  categoryId: string;
-
-  @Field(() => String, { nullable: true })
-  accountId?: string;
+  @Field(() => String)
+  accountId: string;
 }

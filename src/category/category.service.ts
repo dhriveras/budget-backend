@@ -68,7 +68,10 @@ export class CategoryService {
     const isUnque =
       (await this.prismaService.category.count({
         where: {
-          name,
+          name: {
+            equals: name,
+            mode: 'insensitive',
+          },
           createdBy: userId,
         },
       })) === 0;
