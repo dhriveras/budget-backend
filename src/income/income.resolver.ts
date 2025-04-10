@@ -52,11 +52,11 @@ export class IncomeResolver {
 
   @Mutation(() => Income)
   deleteIncome(@Args('id') id: string, @Me() user: User) {
-    return this.incomeService.remove(id, user.id);
+    return this.incomeService.delete(id, user.id);
   }
 
-  @ResolveField(() => Account)
+  @ResolveField(() => Account, { nullable: true })
   async account(@Parent() { accountId }: Income, @Me() user: User) {
-    return this.accountService.findOne(accountId, user.id);
+    if (accountId) return this.accountService.findOne(accountId, user.id);
   }
 }

@@ -32,12 +32,12 @@ export class Income {
     @Field(() => Date, {nullable:false})
     updatedAt!: Date;
 
-    @Field(() => String, {nullable:false})
-    accountId!: string;
+    @Field(() => String, {nullable:true})
+    accountId!: string | null;
 
     @Field(() => User, {nullable:false})
     user?: User;
 
-    @Field(() => Account, {nullable:false})
-    account?: Account;
+    @Field(() => Account, {nullable:true})
+    account?: Account | null;
 }

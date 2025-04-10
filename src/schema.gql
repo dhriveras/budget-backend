@@ -47,9 +47,9 @@ type CategoryCount {
 }
 
 input CreateAccountInput {
-  currency: Currency! = USD
+  currency: Currency = USD
   description: String
-  initialBalance: Float! = 0
+  initialBalance: Float = 0
   name: String!
   type: AccountType!
 }
@@ -110,6 +110,7 @@ type Expense {
 }
 
 input ExpenseFilterInput {
+  accountId: String
   categoryId: String
   dateFrom: DateTime
   dateTo: DateTime
@@ -118,8 +119,8 @@ input ExpenseFilterInput {
 }
 
 type Income {
-  account: Account!
-  accountId: String!
+  account: Account
+  accountId: String
   amount: Float!
   createdAt: DateTime!
   createdBy: String!
@@ -143,14 +144,14 @@ type Mutation {
   createCategory(data: CreateCategoryInput!): Category!
   createExpense(data: CreateExpenseInput!): Expense!
   createIncome(data: CreateIncomeInput!): Income!
+  deleteAccount(id: String!): Account!
+  deleteCategory(id: String!): Category!
   deleteExpense(id: String!): Expense!
   deleteIncome(id: String!): Income!
+  deleteUser(id: String!): User!
   login(email: String!, password: String!): Token!
   logout: Boolean!
   refreshToken(refreshToken: String!): Token!
-  removeAccount(id: String!): Account!
-  removeCategory(id: String!): Category!
-  removeUser(id: String!): User!
   singup(createUserInput: CreateUserInput!): User!
   updateAccount(data: UpdateAccountInput!, id: String!): Account!
   updateCategory(data: UpdateCategoryInput!, id: String!): Category!

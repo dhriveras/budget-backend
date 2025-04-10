@@ -1,21 +1,24 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { CreateAccountInput } from './inputTypes/create-account.input';
+import { SortConsts } from 'src/common/consts/sort.consts';
+import { ErrorConsts } from 'src/common/consts/error.consts';
 
 @Injectable()
 export class AccountService {
   constructor(@Inject() private readonly prismaService: PrismaService) {}
 
   async findOne(id: string, userId: string) {
-    const account = await this.prismaService.account.findUnique({
-      where: { id, createdBy: userId },
-    });
-
-    if (!account) {
-      throw new Error('Account not found');
-    }
-
-    return account;
+    return this.prismaService.account
+      .findUniqueOrThrow({
+        where: { id, createdBy: userId },
+      })
+      .catch(() => {
+        throw new HttpException(
+          ErrorConsts.ACCOUNT_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      });
   }
 
   findAll(userId: string) {
@@ -24,7 +27,7 @@ export class AccountService {
         where: { id: userId },
       })
       .accounts({
-        orderBy: { name: 'asc' },
+        orderBy: { name: SortConsts.ASC },
       });
   }
 
@@ -52,7 +55,7 @@ export class AccountService {
     });
   }
 
-  async remove(id: string, userId: string) {
+  async delete(id: string, userId: string) {
     await this.findOne(id, userId);
 
     return this.prismaService.account.delete({
@@ -73,7 +76,10 @@ export class AccountService {
       })) === 0;
 
     if (!isUnque) {
-      throw new Error('Account name must be unique');
+      throw new HttpException(
+        ErrorConsts.ACCOUNT_ALREADY_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

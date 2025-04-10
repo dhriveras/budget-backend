@@ -10,12 +10,12 @@ export class CreateAccountInput {
   @Field(() => String, { nullable: true })
   description?: string;
 
-  @Field(() => Number, { defaultValue: 0 })
+  @Field(() => Number, { nullable: true, defaultValue: 0 })
   initialBalance: number;
 
   @Field(() => AccountType)
   type: keyof typeof AccountType;
 
-  @Field(() => Currency, { defaultValue: Currency.USD })
+  @Field(() => Currency, { nullable: true, defaultValue: Currency.USD })
   currency: keyof typeof Currency;
 }

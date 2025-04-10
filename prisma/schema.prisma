@@ -44,10 +44,11 @@ model Category {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  user     User      @relation(fields: [createdBy], references: [id])
+  user     User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   expenses Expense[]
 
   @@unique([name, createdBy])
+  @@index([createdBy])
 }
 
 model Expense {
@@ -62,9 +63,14 @@ model Expense {
   updatedAt   DateTime @updatedAt
   accountId   String?
 
-  user     User      @relation(fields: [createdBy], references: [id])
+  user     User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id])
   account  Account?  @relation(fields: [accountId], references: [id])
+
+  @@index([categoryId])
+  @@index([accountId])
+  @@index([createdBy])
+  @@index([createdAt])
 }
 
 model Income {
@@ -76,10 +82,14 @@ model Income {
   createdBy   String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  accountId   String
+  accountId   String?
 
-  user    User    @relation(fields: [createdBy], references: [id])
-  account Account @relation(fields: [accountId], references: [id])
+  user    User     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  account Account? @relation(fields: [accountId], references: [id])
+
+  @@index([accountId])
+  @@index([createdBy])
+  @@index([createdAt])
 }
 
 model Account {
@@ -93,11 +103,12 @@ model Account {
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
 
-  user     User      @relation(fields: [createdBy], references: [id])
+  user     User      @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   expenses Expense[]
   incomes  Income[]
 
   @@unique([name, createdBy])
+  @@index([createdBy])
 }
 
 enum AccountType {

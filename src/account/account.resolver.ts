@@ -42,8 +42,8 @@ export class AccountResolver {
   }
 
   @Mutation(() => Account)
-  removeAccount(@Me() user: User, @Args('id') id: string) {
-    return this.accountService.remove(id, user.id);
+  deleteAccount(@Me() user: User, @Args('id') id: string) {
+    return this.accountService.delete(id, user.id);
   }
 
   @ResolveField(() => Number)

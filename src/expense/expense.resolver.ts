@@ -58,7 +58,7 @@ export class ExpenseResolver {
 
   @Mutation(() => Expense)
   async deleteExpense(@Args('id') id: string, @Me() user: User) {
-    return this.expenseService.remove(id, user.id);
+    return this.expenseService.delete(id, user.id);
   }
 
   @ResolveField(() => Category, { nullable: true })
@@ -66,7 +66,7 @@ export class ExpenseResolver {
     if (categoryId) return this.categoryService.findOne(categoryId, createdBy);
   }
 
-  @ResolveField(() => Account)
+  @ResolveField(() => Account, { nullable: true })
   async account(@Parent() { accountId }: Expense, @Me() user: User) {
     if (accountId) return this.accountService.findOne(accountId, user.id);
   }

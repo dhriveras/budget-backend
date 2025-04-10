@@ -5,6 +5,9 @@ export class ExpenseFilterInput {
   @Field({ nullable: true })
   categoryId?: string;
 
+  @Field({ nullable: true })
+  accountId?: string;
+
   @Field(() => Float, { nullable: true })
   minAmount?: number;
 

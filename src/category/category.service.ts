@@ -1,7 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { CreateCategoryInput } from './inputTypes/create-category.input';
 import { UpdateCategoryInput } from './inputTypes/update-category.input';
+import { SortConsts } from 'src/common/consts/sort.consts';
+import { ErrorConsts } from 'src/common/consts/error.consts';
 
 @Injectable()
 export class CategoryService {
@@ -11,15 +13,16 @@ export class CategoryService {
   ) {}
 
   async findOne(id: string, userId: string) {
-    const category = await this.prismaService.category.findUnique({
-      where: { id, createdBy: userId },
-    });
-
-    if (!category) {
-      throw new Error('Category not found');
-    }
-
-    return category;
+    return this.prismaService.category
+      .findUniqueOrThrow({
+        where: { id, createdBy: userId },
+      })
+      .catch(() => {
+        throw new HttpException(
+          ErrorConsts.CATEGORY_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      });
   }
 
   findAll(userId: string) {
@@ -28,7 +31,7 @@ export class CategoryService {
         where: { id: userId },
       })
       .categories({
-        orderBy: { name: 'asc' },
+        orderBy: { name: SortConsts.ASC },
       });
   }
 
@@ -56,7 +59,7 @@ export class CategoryService {
     });
   }
 
-  async remove(id: string, userId: string) {
+  async delete(id: string, userId: string) {
     await this.findOne(id, userId);
 
     return this.prismaService.category.delete({
@@ -77,7 +80,10 @@ export class CategoryService {
       })) === 0;
 
     if (!isUnque) {
-      throw new Error('Category name must be unique');
+      throw new HttpException(
+        ErrorConsts.CATEGORY_ALREADY_EXISTS,
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

@@ -35,7 +35,7 @@ export class CategoryResolver {
   }
 
   @Mutation(() => Category)
-  removeCategory(@Me() user: User, @Args('id') id: string) {
-    return this.categoryService.remove(id, user.id);
+  deleteCategory(@Me() user: User, @Args('id') id: string) {
+    return this.categoryService.delete(id, user.id);
   }
 }
