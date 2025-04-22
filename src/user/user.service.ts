@@ -1,19 +1,16 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserInput } from './inputTypes/create-user.input';
 import { UpdateUserInput } from './inputTypes/update-user.input';
-import { PrismaClient } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { ErrorConsts } from 'src/common/consts/error.consts';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  constructor(
-    @Inject('PrismaService')
-    private prismaService: PrismaClient,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async findOne(id: string) {
-    return this.prismaService.user
+  findOne(id: string) {
+    return this.prismaService.client.user
       .findUniqueOrThrow({
         where: { id },
       })
@@ -25,14 +22,14 @@ export class UserService {
       });
   }
 
-  async findByEmail(email: string) {
-    return this.prismaService.user.findUnique({
+  findByEmail(email: string) {
+    return this.prismaService.client.user.findUnique({
       where: { email },
     });
   }
 
-  async findAll() {
-    return this.prismaService.user.findMany();
+  findAll() {
+    return this.prismaService.client.user.findMany();
   }
 
   async create(data: CreateUserInput) {
@@ -51,7 +48,7 @@ export class UserService {
     const hashedPassword = await argon2.hash(password);
 
     // Store the user in the database
-    return this.prismaService.user.create({
+    return this.prismaService.client.user.create({
       data: {
         ...rest,
         email,
@@ -63,20 +60,20 @@ export class UserService {
   async update(id: string, data: UpdateUserInput) {
     await this.findOne(id);
 
-    return this.prismaService.user.update({
+    return this.prismaService.client.user.update({
       where: { id },
       data: { ...data },
     });
   }
 
-  async delete(id: string) {
-    return this.prismaService.user.delete({
+  delete(id: string) {
+    return this.prismaService.client.user.delete({
       where: { id },
     });
   }
 
-  async updateRefreshToken(id: string, refreshToken: string | null) {
-    return this.prismaService.user.update({
+  updateRefreshToken(id: string, refreshToken: string | null) {
+    return this.prismaService.client.user.update({
       where: { id },
       data: { refreshToken },
     });

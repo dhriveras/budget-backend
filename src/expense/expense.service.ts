@@ -1,22 +1,22 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { CreateExpenseInput } from './inputTypes/create-expense.input';
 import { UpdateExpenseInput } from './inputTypes/update-expense.input';
 import { ExpenseFilterInput } from './inputTypes/filters/expense-filter.input';
 import { ErrorConsts } from 'src/common/consts/error.consts';
 import { SortConsts } from 'src/common/consts/sort.consts';
 import { CommonService } from 'src/common/common.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ExpenseService {
   constructor(
-    @Inject('PrismaService')
-    private readonly prismaService: PrismaClient,
+    private readonly prismaService: PrismaService,
     private readonly commonService: CommonService,
   ) {}
 
-  async findOne(id: string, userId: string) {
-    return this.prismaService.expense
+  findOne(id: string, userId: string) {
+    return this.prismaService.client.expense
       .findUniqueOrThrow({
         where: { id, createdBy: userId },
       })
@@ -28,8 +28,8 @@ export class ExpenseService {
       });
   }
 
-  async findAll(userId: string, filter?: ExpenseFilterInput) {
-    return this.prismaService.user
+  findAll(userId: string, filter?: ExpenseFilterInput) {
+    return this.prismaService.client.user
       .findUnique({
         where: { id: userId },
       })
@@ -48,7 +48,7 @@ export class ExpenseService {
     if (data.accountId)
       await this.commonService.validateAccount(data.accountId, userId);
 
-    return this.prismaService.expense.create({
+    return this.prismaService.client.expense.create({
       data: {
         ...data,
 
@@ -67,7 +67,7 @@ export class ExpenseService {
     if (data.accountId)
       await this.commonService.validateAccount(data.accountId, userId);
 
-    return this.prismaService.expense.update({
+    return this.prismaService.client.expense.update({
       where: { id },
       data,
     });
@@ -76,7 +76,7 @@ export class ExpenseService {
   async delete(id: string, userId: string) {
     await this.findOne(id, userId);
 
-    return this.prismaService.expense.delete({
+    return this.prismaService.client.expense.delete({
       where: { id },
     });
   }

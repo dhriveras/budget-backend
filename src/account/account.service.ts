@@ -1,15 +1,15 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from 'nestjs-prisma';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAccountInput } from './inputTypes/create-account.input';
 import { SortConsts } from 'src/common/consts/sort.consts';
 import { ErrorConsts } from 'src/common/consts/error.consts';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AccountService {
-  constructor(@Inject() private readonly prismaService: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async findOne(id: string, userId: string) {
-    return this.prismaService.account
+  findOne(id: string, userId: string) {
+    return this.prismaService.client.account
       .findUniqueOrThrow({
         where: { id, createdBy: userId },
       })
@@ -22,7 +22,7 @@ export class AccountService {
   }
 
   findAll(userId: string) {
-    return this.prismaService.user
+    return this.prismaService.client.user
       .findUnique({
         where: { id: userId },
       })
@@ -34,7 +34,7 @@ export class AccountService {
   async create(data: CreateAccountInput, userId: string) {
     await this.validateIfNameIsUnique(data.name, userId);
 
-    return this.prismaService.account.create({
+    return this.prismaService.client.account.create({
       data: {
         ...data,
         createdBy: userId,
@@ -49,7 +49,7 @@ export class AccountService {
       await this.validateIfNameIsUnique(data.name, userId);
     }
 
-    return this.prismaService.account.update({
+    return this.prismaService.client.account.update({
       where: { id: account.id },
       data,
     });
@@ -58,14 +58,14 @@ export class AccountService {
   async delete(id: string, userId: string) {
     await this.findOne(id, userId);
 
-    return this.prismaService.account.delete({
+    return this.prismaService.client.account.delete({
       where: { id },
     });
   }
 
   private async validateIfNameIsUnique(name: string, userId: string) {
     const isUnque =
-      (await this.prismaService.account.count({
+      (await this.prismaService.client.account.count({
         where: {
           name: {
             equals: name,
@@ -87,7 +87,7 @@ export class AccountService {
     const { initialBalance } = await this.findOne(id, userId);
 
     const { expenses = [], incomes = [] } =
-      (await this.prismaService.account.findUnique({
+      (await this.prismaService.client.account.findUnique({
         where: { id, createdBy: userId },
         include: { incomes: true, expenses: true },
       })) ?? { expenses: [], incomes: [] };

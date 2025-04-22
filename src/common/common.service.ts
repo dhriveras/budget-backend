@@ -1,16 +1,13 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ErrorConsts } from 'src/common/consts/error.consts';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CommonService {
-  constructor(
-    @Inject('PrismaService')
-    private readonly prismaService: PrismaClient,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async validateCategory(categoryId: string, userId: string) {
-    return this.prismaService.category
+  validateCategory(categoryId: string, userId: string) {
+    return this.prismaService.client.category
       .findFirstOrThrow({
         where: { id: categoryId, createdBy: userId },
       })
@@ -22,8 +19,8 @@ export class CommonService {
       });
   }
 
-  async validateAccount(accountId: string, userId: string) {
-    return this.prismaService.account
+  validateAccount(accountId: string, userId: string) {
+    return this.prismaService.client.account
       .findFirstOrThrow({
         where: { id: accountId, createdBy: userId },
       })

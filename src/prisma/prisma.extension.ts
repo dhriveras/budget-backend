@@ -1,6 +1,17 @@
 import { PrismaClient } from '@prisma/client';
+import { pagination } from 'prisma-extension-pagination';
 
-const prismaSingleton = new PrismaClient();
+const baseClient = new PrismaClient();
 
-export { prismaSingleton as extendedPrismaClient };
-export type ExtendedPrismaClient = PrismaClient;
+const extendedClient = baseClient.$extends(pagination());
+
+export type ExtendedPrismaClient = typeof extendedClient;
+
+let prismaSingleton: ExtendedPrismaClient | null = null;
+
+export function getExtendedPrismaClient(): ExtendedPrismaClient {
+  if (!prismaSingleton) {
+    prismaSingleton = extendedClient;
+  }
+  return prismaSingleton;
+}

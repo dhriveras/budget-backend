@@ -1,19 +1,17 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
 import { CreateCategoryInput } from './inputTypes/create-category.input';
 import { UpdateCategoryInput } from './inputTypes/update-category.input';
 import { SortConsts } from 'src/common/consts/sort.consts';
 import { ErrorConsts } from 'src/common/consts/error.consts';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CategoryService {
-  constructor(
-    @Inject('PrismaService')
-    private prismaService: PrismaClient,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
-  async findOne(id: string, userId: string) {
-    return this.prismaService.category
+  findOne(id: string, userId: string) {
+    return this.prismaService.client.category
       .findUniqueOrThrow({
         where: { id, createdBy: userId },
       })
@@ -26,7 +24,7 @@ export class CategoryService {
   }
 
   findAll(userId: string) {
-    return this.prismaService.user
+    return this.prismaService.client.user
       .findUnique({
         where: { id: userId },
       })
@@ -38,7 +36,7 @@ export class CategoryService {
   async create(data: CreateCategoryInput, userId: string) {
     await this.validateIfNameIsUnique(data.name, userId);
 
-    return this.prismaService.category.create({
+    return this.prismaService.client.category.create({
       data: {
         ...data,
         createdBy: userId,
@@ -53,7 +51,7 @@ export class CategoryService {
       await this.validateIfNameIsUnique(data.name, userId);
     }
 
-    return this.prismaService.category.update({
+    return this.prismaService.client.category.update({
       where: { id: category.id },
       data,
     });
@@ -62,14 +60,14 @@ export class CategoryService {
   async delete(id: string, userId: string) {
     await this.findOne(id, userId);
 
-    return this.prismaService.category.delete({
+    return this.prismaService.client.category.delete({
       where: { id },
     });
   }
 
   private async validateIfNameIsUnique(name: string, userId: string) {
     const isUnque =
-      (await this.prismaService.category.count({
+      (await this.prismaService.client.category.count({
         where: {
           name: {
             equals: name,
